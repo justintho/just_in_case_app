@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:just_in_case_app/date_picker.dart';
-import 'package:just_in_case_app/time_picker.dart';
+import 'dart:async';
 
 class ReminderCreationPage extends StatefulWidget {
   const ReminderCreationPage({Key? key}) : super(key: key);
@@ -10,6 +9,9 @@ class ReminderCreationPage extends StatefulWidget {
 }
 
 class _ReminderCreationPageState extends State<ReminderCreationPage> {
+  DateTime? _dateTime;
+  TimeOfDay? _time;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,22 +25,40 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
               'Pick Date'
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DatePickerPage()),
-              );
+              showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime(DateTime.now().year + 10),
+              ).then((date) {
+                setState(() {
+                  _dateTime = date;
+                });
+              });
             }
+          ),
+          Text(
+            _dateTime == null ? 'Please select a date.' :
+              'Date: ${_dateTime!.month.toString().padLeft(2,'0')}/${_dateTime!.day.toString().padLeft(2,'0')}/${_dateTime!.year.toString()}'
           ),
           ElevatedButton(
               child: Text(
                   'Pick Time'
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TimePickerPage()),
-                );
+                showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                ).then((time) {
+                  setState(() {
+                    _time = time;
+                  });
+                });
               }
+          ),
+          Text(
+            _time == null ? 'Please select a time.' :
+               'Time: ${_time!.format(context)}'
           )
         ]
       )
