@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_in_case_app/reminder_list.dart';
 
-void main() {
+main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(MyApp());
 }
 
@@ -27,13 +30,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +49,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(fontSize: 50),
               ),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
+                  //MaterialPageRoute(builder: (context) => ReminderListPage()),
                   MaterialPageRoute(builder: (context) => ReminderListPage()),
                 );
               },
               child: Text(
                 'Get Started!',
+                style: TextStyle(fontSize: 25)
               ),
-            ),
+            )
           ],
         ),
       ),
