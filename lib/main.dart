@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:just_in_case_app/reminder_list.dart';
+import 'package:just_in_case_app/task_list.dart';
 
 main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +15,11 @@ class MyApp extends StatelessWidget {
       title: 'Just In Case',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        primaryTextTheme: TextTheme(
+          headline6: TextStyle(
+            color: Colors.black
+          )
+        )
       ),
       home: MyHomePage(title: 'Just In Case App'),
     );
@@ -34,20 +39,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(bottom: 10),
-              child: Text(
-                'Just In Case',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 50),
-              ),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 100),
+              child: Image(
+                image: AssetImage('assets/fullAppLogo.png'),
+              )
             ),
             TextButton(
               onPressed: () {

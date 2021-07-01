@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -41,7 +43,7 @@ initialize() async {
   await _configureLocalTimeZone();
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings('ic_launcher');
+  AndroidInitializationSettings('app_logo_only');
 
   final IOSInitializationSettings initializationSettingsIOS =
   IOSInitializationSettings(
@@ -76,8 +78,6 @@ class Task {
   String name = "";
   String description = "";
   DateTime dueDateTime = DateTime.now();
-  String formattedDueDate = "";
-  String formattedDueTime = "";
   String iconPath = 'https://cdn0.iconfinder.com/data/icons/logistics-delivery-colored-2/128/32-512.png';
 
   Task (String taskName, String taskDescription, DateTime taskDueDateTime, String icon) {
@@ -85,7 +85,6 @@ class Task {
     if (taskDescription != "")
       description = taskDescription;
     dueDateTime = taskDueDateTime;
-    formattedDueDate = DateFormat.yMMMMd().format(dueDateTime);
     iconPath = icon;
   }
 
@@ -108,12 +107,12 @@ class Task {
     return TimeOfDay.fromDateTime(dueDateTime);
   }
 
-  String getFormattedDueDate() {
-    return formattedDueDate;
-  }
-
   String getIcon() {
     return iconPath;
+  }
+
+  String getFormattedDueDate() {
+    return '${dueDateTime.month.toString().padLeft(2,'0')}/${dueDateTime.day.toString().padLeft(2,'0')}/${dueDateTime.year.toString()}';
   }
 }
 
@@ -235,226 +234,283 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text('Create A New Reminder'),
-      ),
-      body: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 20),
-            child: Text(
-              'Task Name',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-            )
+        appBar: AppBar(
+          leading: BackButton(
+            color: Colors.black,
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              padding: EdgeInsets.only(left: 10, right: 10),
-              height: 50,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                controller: myController1,
-                maxLength: 25,
-                decoration: new InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    hintText: 'Name of task (up to 25 characters)',
-                    hintStyle: TextStyle(fontStyle: FontStyle.italic)
-                ),
-                  style: TextStyle(fontSize: 20)
-              ),
-            )
-          ),
-          Container(
-              child: Text(
-                  'Message',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-              )
-          ),
-          Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                height: 50,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: TextField(
-                  controller: myController2,
-                  decoration: new InputDecoration(
-                      contentPadding: EdgeInsets.zero,
-                      border: InputBorder.none,
-                      hintText: 'Description or note to self (optional)',
-                      hintStyle: TextStyle(fontStyle: FontStyle.italic)
-                  ),
-                    style: TextStyle(fontSize: 20)
-                ),
-              )
-          ),
-          Container(
-              child: Text(
-                  'Icon',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-              )
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              padding: EdgeInsets.only(left: 10, right: 10),
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: Colors.grey, 
-                    width: 1
-                ),
-                borderRadius: BorderRadius.circular(10)
-              ),
-
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selected,
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconSize: 36,
-                  isExpanded: true,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selected = newValue!;
-                    });
-                  },
-                  items: iconNameList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                          value,
-                          style: TextStyle(fontSize: 20)
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-          Container(
-              child: Text(
-                  'Due Date & Time',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-              )
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-            child: Row(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Column(
-                      children: [
-                        ElevatedButton(
-                            child: Text(
-                                'Pick Date',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-                            ),
-                            onPressed: () {
-                              showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(DateTime.now().year + 10),
-                              ).then((date) {
-                                setState(() {
-                                  _date = date!;
-                                });
-                              });
-                            }
-                        ),
-                        Text(
-                          '${_date.month.toString().padLeft(2,'0')}/${_date.day.toString().padLeft(2,'0')}/${_date.year.toString()}',
-                          style: TextStyle(fontSize: 15)
-                        ),
-                      ]
+                Image.asset(
+                    'assets/appLogo.png',
+                    fit: BoxFit.contain,
+                    height: 50
+                ),
+              ]
+          )
+        ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage('https://www.seekpng.com/png/full/13-136905_index-of-wp-content-graphic-freeuse-download-real.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 60),
+              width: 200,
+              height: 60,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage('https://cdn.picpng.com/logo/logo-emblem-symbol-bookmark-72047.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Create A Task',
+                    style: TextStyle(fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Column(
-                      children: [
-                        ElevatedButton(
-                            child: Text(
-                                'Pick Time',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-                            ),
-                            onPressed: () {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              ).then((time) {
-                                setState(() {
-                                  _time = time!;
-                                });
-                              });
-                            }
-                        ),
-                        Text(
-                          '${_time.format(context)}',
-                            style: TextStyle(fontSize: 15)
-                        ),
-                      ]
-                    ),
-                  ),
-                )
-              ]
+              ),
             ),
-          ),
-          Spacer(),
-          Text(
-            errorMessage,
-            style: TextStyle(
-              color: Colors.red.withOpacity(1),
-              fontSize: 18
-            )
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 20),
-            child: TextButton(
-                child: Text(
-                  'Create',
-                  style: TextStyle(
-                      color: Colors.lightBlue,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Text(
+                    'Task Name',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
                   )
                 ),
-                onPressed: () {
-                  DateTime _dateTime = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
-                  if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime)) {
-                    errorMessage = '';
-                    taskName = myController1.text;
-                    if (myController2.text.length != 0)
-                      taskDescription = myController2.text;
-                    icon = determineIcon(_selected);
-                    Task task = Task(taskName, taskDescription, _dateTime, icon);
-                    _scheduleNotification();
-                    taskDescription = "";
-                    Navigator.pop(context, task);
-                  }
-                  else
-                    if (myController1.text.length == 0)
-                      errorMessage = 'Please enter a task name.';
-                    else
-                      errorMessage = 'Invalid due date/time.';
-                    setState(() {
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey, width: 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextField(
+                      controller: myController1,
+                      maxLength: 25,
+                      decoration: new InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: 'Name of task (up to 25 characters)',
+                          hintStyle: TextStyle(fontStyle: FontStyle.italic)
+                      ),
+                        style: TextStyle(fontSize: 20)
+                    ),
+                  )
+                ),
+                Container(
+                    child: Text(
+                        'Message',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                    )
+                ),
+                Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      padding: EdgeInsets.only(left: 10, right: 10),
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey, width: 1),
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextField(
+                        controller: myController2,
+                        decoration: new InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            hintText: 'Description or note to self (optional)',
+                            hintStyle: TextStyle(fontStyle: FontStyle.italic)
+                        ),
+                          style: TextStyle(fontSize: 20)
+                      ),
+                    )
+                ),
+                Container(
+                    child: Text(
+                        'Icon',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                    )
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1
+                      ),
+                      borderRadius: BorderRadius.circular(10)
+                    ),
 
-                    });
-                },
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selected,
+                        icon: Icon(Icons.arrow_drop_down),
+                        iconSize: 36,
+                        isExpanded: true,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selected = newValue!;
+                          });
+                        },
+                        items: iconNameList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                                value,
+                                style: TextStyle(fontSize: 20)
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      child: Column(
+                        children: [
+                          Text(
+                              'Date',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                          ),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.white,
+                                onPrimary: Colors.black,
+                              ),
+                              child: Text(
+                                  '${_date.month.toString().padLeft(2,'0')}/${_date.day.toString().padLeft(2,'0')}/${_date.year.toString()}',
+                                  style: TextStyle(fontSize: 20)
+                              ),
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(DateTime.now().year + 10),
+                                ).then((date) {
+                                  setState(() {
+                                    _date = date!;
+                                  });
+                                });
+                              }
+                          )
+                        ]
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      child: Column(
+                        children: [
+                          Text(
+                              'Time',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                          ),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.white,
+                                onPrimary: Colors.black,
+                              ),
+                              child: Text(
+                                  '${_time.format(context)}',
+                                  style: TextStyle(fontSize: 20)
+                              ),
+                              onPressed: () {
+                                showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                ).then((time) {
+                                  setState(() {
+                                    _time = time!;
+                                  });
+                                });
+                              }
+                          )
+                        ]
+                      ),
+                    ),
+                  )
+                ]
               ),
-          ),
-        ]
+            ),
+            Spacer(),
+            Text(
+              errorMessage,
+              style: TextStyle(
+                color: Colors.red.withOpacity(1),
+                fontSize: 18
+              )
+            ),
+            Container(
+              margin: EdgeInsets.only(bottom: 20),
+              child: TextButton(
+                  child: Text(
+                    'Create',
+                    style: TextStyle(
+                        color: Colors.lightBlue,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold
+                    )
+                  ),
+                  onPressed: () {
+                    DateTime _dateTime = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
+                    if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime)) {
+                      errorMessage = '';
+                      taskName = myController1.text;
+                      if (myController2.text.length != 0)
+                        taskDescription = myController2.text;
+                      icon = determineIcon(_selected);
+                      Task task = Task(taskName, taskDescription, _dateTime, icon);
+                      _scheduleNotification();
+                      taskDescription = "";
+                      Navigator.pop(context, task);
+                    }
+                    else
+                      if (myController1.text.length == 0)
+                        errorMessage = 'Please enter a task name.';
+                      else
+                        errorMessage = 'Invalid due date/time.';
+                      setState(() {
+
+                      });
+                  },
+                ),
+            ),
+          ]
+        ),
       )
     );
   }

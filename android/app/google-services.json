@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "309655500435",
+    "project_id": "just-in-case-app",
+    "storage_bucket": "just-in-case-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309655500435:android:5b62bc7befdcc945483f66",
+        "android_client_info": {
+          "package_name": "com.cpp.edu.justintho.just_in_case_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309655500435-7vpb6al90ot0h1p7nd2e62qd3n61153f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAYB5Yd03rjikRl-5mt6ALLN5481--wJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309655500435-7vpb6al90ot0h1p7nd2e62qd3n61153f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
