@@ -1,18 +1,73 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:just_in_case_app/reminder_creation.dart';
 import 'package:just_in_case_app/task_info.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ReminderListPage extends StatefulWidget {
+  String email;
+
+  ReminderListPage(this.email);
 
   @override
   _ReminderListPageState createState() => _ReminderListPageState();
 }
 
 class _ReminderListPageState extends State<ReminderListPage> {
+  String email = '';
   var taskList = [];
 
-  _sortList () {
+  _loadData() {
+    FirebaseDatabase.instance.reference().child(email).once()
+        .then((data) {
+      print("Successfully loaded data!");
+      var tempTaskList = [];
+      taskList = [];
+      data.value?.forEach((k, v) {
+        tempTaskList.add(v);
+      });
+      for (int i = 0; i < tempTaskList.length; i++) {
+        taskList.add(
+            new Task(
+                tempTaskList[i]['name'],
+                tempTaskList[i]['description'],
+                DateTime.parse(tempTaskList[i]['dueDateTime']),
+                tempTaskList[i]['icon'],
+                DateTime.parse(tempTaskList[i]['reminderDueDateTime']),
+                tempTaskList[i]['id']
+            )
+        );
+      }
+      setState(() {
+        _sortList();
+      });
+    }).catchError((error) {
+      print("Failed to load the data!");
+      print(error);
+    });
+  }
+
+  _sortList() {
     taskList.sort((a, b) => a.getDueDateTime().compareTo(b.getDueDateTime()));
+  }
+
+  _updateList() {
+    for (int i = 0; i < taskList.length; i++) {
+      if (taskList[i].getDueDateTime().isBefore(DateTime.now())) {
+        FirebaseDatabase.instance.reference()
+            .child(email + '/task' + taskList[i].getID())
+            .remove();
+      }
+    }
+    _loadData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    String tempEmail = widget.email;
+    email = tempEmail.split(".").join("");
+    _loadData();
   }
 
   @override
@@ -44,9 +99,8 @@ class _ReminderListPageState extends State<ReminderListPage> {
               size: 25,
             ),
             onPressed: () {
-              setState(() {
-                print("Refreshed!");
-              });
+              _updateList();
+              print("Refreshed");
             },
           )
         ],
@@ -54,7 +108,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
       body: Container(
         decoration: BoxDecoration(
         image: DecorationImage(
-        image: NetworkImage('https://www.seekpng.com/png/full/13-136905_index-of-wp-content-graphic-freeuse-download-real.png'),
+        image: AssetImage('assets/appBackground.png'),
         fit: BoxFit.cover,
         ),
       ),
@@ -72,7 +126,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                           height: 60,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage('https://cdn.picpng.com/logo/logo-emblem-symbol-bookmark-72047.png'),
+                              image: AssetImage('assets/bookmark.png'),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -82,7 +136,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Text(
                                 'Next Task',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
+                                style: GoogleFonts.neucha(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -95,8 +149,8 @@ class _ReminderListPageState extends State<ReminderListPage> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => TaskInfoPage(taskList[index])),
-                            );
+                              MaterialPageRoute(builder: (context) => TaskInfoPage(taskList[index], email)),
+                            ).then((value) => _updateList());
                           },
                           title: Container(
                             height: 70,
@@ -112,7 +166,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                                   ),
                                   Text(
                                     '${taskList[index].getName()}',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.rancho(fontSize: 30)
                                   ),
                                   Spacer(),
                                   Container(
@@ -123,9 +177,11 @@ class _ReminderListPageState extends State<ReminderListPage> {
                                       children: [
                                         Text(
                                           '${taskList[index].getFormattedDueDate()}',
+                                          style: GoogleFonts.courgette(),
                                         ),
                                         Text(
-                                          '${taskList[index].getDueTime().format(context)}'
+                                          '${taskList[index].getDueTime().format(context)}',
+                                          style: GoogleFonts.courgette(),
                                         ),
                                       ],
                                     ),
@@ -141,7 +197,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                           height: 60,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage('https://cdn.pixabay.com/photo/2015/04/04/21/11/logo-707109_960_720.png'),
+                              image: AssetImage('assets/bookmark.png'),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -151,7 +207,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Text(
                                 'Upcoming Tasks',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
+                                style: GoogleFonts.neucha(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -167,8 +223,8 @@ class _ReminderListPageState extends State<ReminderListPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => TaskInfoPage(taskList[index])),
-                      );
+                        MaterialPageRoute(builder: (context) => TaskInfoPage(taskList[index], email)),
+                      ).then((value) => _updateList());
                     },
                     title: Container(
                       height: 70,
@@ -184,7 +240,7 @@ class _ReminderListPageState extends State<ReminderListPage> {
                                 ),
                                 Text(
                                   '${taskList[index].getName()}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.rancho(fontSize: 30),
                                 ),
                                 Spacer(),
                                 Container(
@@ -195,9 +251,11 @@ class _ReminderListPageState extends State<ReminderListPage> {
                                     children: [
                                       Text(
                                         '${taskList[index].getFormattedDueDate()}',
+                                        style: GoogleFonts.courgette(),
                                       ),
                                       Text(
-                                          '${taskList[index].getDueTime().format(context)}'
+                                        '${taskList[index].getDueTime().format(context)}',
+                                        style: GoogleFonts.courgette(),
                                       ),
                                     ],
                                   ),
@@ -217,17 +275,27 @@ class _ReminderListPageState extends State<ReminderListPage> {
             MaterialPageRoute(builder: (context) => ReminderCreationPage()),
         );
         if (task != null) {
-          taskList.add(task);
-          if (taskList.length > 1)
-            _sortList();
+          FirebaseDatabase.instance.reference().child(email + "/task" + task.getID()).set(
+              {
+                "name": task.getName(),
+                "description" : task.getDescription(),
+                "dueDateTime" : task.getDueDateTime().toString(),
+                "icon" : task.getIcon(),
+                "reminderDueDateTime" : task.getReminderDueDateTime().toString(),
+                "id" : task.getID()
+              }
+          ).then((value) {
+            print("Successfully added to database!");
+          }).catchError((error) {
+            print("Failed to add to database!");
+            print(error);
+          });
+          _updateList();
         }
-        setState(() {
-
-        });
       },
       tooltip: 'Add New Reminder',
       child: Icon(Icons.add),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.brown,
       ),
     );
   }

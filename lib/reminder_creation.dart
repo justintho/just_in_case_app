@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'main.dart';
@@ -79,13 +77,17 @@ class Task {
   String description = "";
   DateTime dueDateTime = DateTime.now();
   String iconPath = 'https://cdn0.iconfinder.com/data/icons/logistics-delivery-colored-2/128/32-512.png';
+  DateTime reminderDueDateTime = DateTime.now();
+  String id = "";
 
-  Task (String taskName, String taskDescription, DateTime taskDueDateTime, String icon) {
+  Task (String taskName, String taskDescription, DateTime taskDueDateTime, String icon, DateTime reminderDueDateTime, String id) {
     name = taskName;
     if (taskDescription != "")
       description = taskDescription;
     dueDateTime = taskDueDateTime;
     iconPath = icon;
+    this.reminderDueDateTime = reminderDueDateTime;
+    this.id = id;
   }
 
   String getName() {
@@ -111,8 +113,23 @@ class Task {
     return iconPath;
   }
 
+  DateTime getReminderDueDateTime() {
+    return reminderDueDateTime;
+  }
+
+  TimeOfDay getReminderDueTime() {
+    return TimeOfDay.fromDateTime(reminderDueDateTime);
+  }
+
+  String getID() {
+    return id;
+  }
+
   String getFormattedDueDate() {
     return '${dueDateTime.month.toString().padLeft(2,'0')}/${dueDateTime.day.toString().padLeft(2,'0')}/${dueDateTime.year.toString()}';
+  }
+  String getFormattedReminderDueDate() {
+    return '${reminderDueDateTime.month.toString().padLeft(2,'0')}/${reminderDueDateTime.day.toString().padLeft(2,'0')}/${reminderDueDateTime.year.toString()}';
   }
 }
 
@@ -255,7 +272,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage('https://www.seekpng.com/png/full/13-136905_index-of-wp-content-graphic-freeuse-download-real.png'),
+            image: AssetImage('assets/appBackground.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -268,7 +285,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
               height: 60,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage('https://cdn.picpng.com/logo/logo-emblem-symbol-bookmark-72047.png'),
+                  image: AssetImage('assets/bookmark.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -277,7 +294,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Create A Task',
-                    style: TextStyle(fontSize: 25,
+                    style: GoogleFonts.neucha(fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Colors.white
                     ),
@@ -292,11 +309,11 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                   margin: EdgeInsets.only(top: 20),
                   child: Text(
                     'Task Name',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                    style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
                   )
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                   child: Container(
                     padding: EdgeInsets.only(left: 10, right: 10),
                     height: 50,
@@ -307,25 +324,25 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                     ),
                     child: TextField(
                       controller: myController1,
-                      maxLength: 25,
+                      maxLength: 20,
                       decoration: new InputDecoration(
                           contentPadding: EdgeInsets.zero,
                           border: InputBorder.none,
-                          hintText: 'Name of task (up to 25 characters)',
-                          hintStyle: TextStyle(fontStyle: FontStyle.italic)
+                          hintText: '*Required* (up to 20 characters)',
+                          hintStyle: GoogleFonts.neucha(fontStyle: FontStyle.italic)
                       ),
-                        style: TextStyle(fontSize: 20)
+                        style: GoogleFonts.neucha(fontSize: 20)
                     ),
                   )
                 ),
                 Container(
                     child: Text(
                         'Message',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                        style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
                     )
                 ),
                 Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                     child: Container(
                       padding: EdgeInsets.only(left: 10, right: 10),
                       height: 50,
@@ -336,24 +353,25 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                       ),
                       child: TextField(
                         controller: myController2,
+                          maxLength: 50,
                         decoration: new InputDecoration(
                             contentPadding: EdgeInsets.zero,
                             border: InputBorder.none,
-                            hintText: 'Description or note to self (optional)',
-                            hintStyle: TextStyle(fontStyle: FontStyle.italic)
+                            hintText: '*Optional* (up to 50 characters)',
+                            hintStyle: GoogleFonts.neucha(fontStyle: FontStyle.italic)
                         ),
-                          style: TextStyle(fontSize: 20)
+                          style: GoogleFonts.neucha(fontSize: 20)
                       ),
                     )
                 ),
                 Container(
                     child: Text(
                         'Icon',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                        style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
                     )
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                   child: Container(
                     padding: EdgeInsets.only(left: 10, right: 10),
                     decoration: BoxDecoration(
@@ -370,7 +388,6 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                         value: _selected,
                         icon: Icon(Icons.arrow_drop_down),
                         iconSize: 36,
-                        isExpanded: true,
                         onChanged: (newValue) {
                           setState(() {
                             _selected = newValue!;
@@ -381,7 +398,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                             value: value,
                             child: Text(
                                 value,
-                                style: TextStyle(fontSize: 20)
+                                style: GoogleFonts.neucha(fontSize: 20),
                             ),
                           );
                         }).toList(),
@@ -392,17 +409,16 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
               ],
             ),
             Container(
-              margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+              margin: EdgeInsets.only(left: 20, right: 20),
               child: Row(
                 children: [
                   Expanded(
-                    flex: 1,
                     child: Container(
                       child: Column(
                         children: [
                           Text(
                               'Date',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                              style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
                           ),
                           ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -411,7 +427,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                               ),
                               child: Text(
                                   '${_date.month.toString().padLeft(2,'0')}/${_date.day.toString().padLeft(2,'0')}/${_date.year.toString()}',
-                                  style: TextStyle(fontSize: 20)
+                                  style: GoogleFonts.courgette(fontSize: 20)
                               ),
                               onPressed: () {
                                 showDatePicker(
@@ -437,7 +453,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                         children: [
                           Text(
                               'Time',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                              style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
                           ),
                           ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -446,7 +462,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                               ),
                               child: Text(
                                   '${_time.format(context)}',
-                                  style: TextStyle(fontSize: 20)
+                                  style: GoogleFonts.courgette(fontSize: 20)
                               ),
                               onPressed: () {
                                 showTimePicker(
@@ -467,47 +483,68 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
               ),
             ),
             Spacer(),
-            Text(
-              errorMessage,
-              style: TextStyle(
-                color: Colors.red.withOpacity(1),
-                fontSize: 18
-              )
-            ),
-            Container(
-              margin: EdgeInsets.only(bottom: 20),
-              child: TextButton(
-                  child: Text(
-                    'Create',
-                    style: TextStyle(
-                        color: Colors.lightBlue,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold
-                    )
-                  ),
-                  onPressed: () {
-                    DateTime _dateTime = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
-                    if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime)) {
-                      errorMessage = '';
-                      taskName = myController1.text;
-                      if (myController2.text.length != 0)
-                        taskDescription = myController2.text;
-                      icon = determineIcon(_selected);
-                      Task task = Task(taskName, taskDescription, _dateTime, icon);
-                      _scheduleNotification();
-                      taskDescription = "";
-                      Navigator.pop(context, task);
-                    }
-                    else
-                      if (myController1.text.length == 0)
-                        errorMessage = 'Please enter a task name.';
-                      else
-                        errorMessage = 'Invalid due date/time.';
-                      setState(() {
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      errorMessage,
+                      style: TextStyle(
+                        color: Colors.red.withOpacity(1),
+                        fontSize: 18
+                      )
+                    ),
+                    Container(
+                      width: 200,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/tape2.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(top: 10, bottom: 20),
+                      child: Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: TextButton(
+                            child: Text(
+                              'Create',
+                              style: GoogleFonts.neucha(
+                                  color: Colors.white,
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.bold
+                              )
+                            ),
+                            onPressed: () {
+                              DateTime _dateTime = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
+                              if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime)) {
+                                errorMessage = '';
+                                taskName = myController1.text;
+                                if (myController2.text.length != 0)
+                                  taskDescription = myController2.text;
+                                icon = determineIcon(_selected);
+                                String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+                                Task task = Task(taskName, taskDescription, _dateTime, icon, _dateTime, timestamp);
+                                _scheduleNotification(int.parse(timestamp));
+                                taskDescription = "";
+                                Navigator.pop(context, task);
+                              }
+                              else
+                                if (myController1.text.length == 0)
+                                  errorMessage = 'Please enter a task name.';
+                                else
+                                  errorMessage = 'Invalid due date/time.';
+                                setState(() {
 
-                      });
-                  },
+                                });
+                            },
+                          ),
+                      ),
+                    ),
+                  ],
                 ),
+              ],
             ),
           ]
         ),
@@ -515,10 +552,10 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
     );
   }
 
-  Future<void> _scheduleNotification() async {
+  Future<void> _scheduleNotification(int timestamp) async {
     // ignore: deprecated_member_use
     await flutterLocalNotificationsPlugin.schedule(
-        0,
+        timestamp,
         taskName,
         taskDescription == "" ? "<No Message>" : taskDescription,
         new DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute),
