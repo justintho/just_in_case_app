@@ -37,7 +37,7 @@ class _SignUpPageState extends State<SignUpPage> {
               margin: EdgeInsets.only(left: 30, right: 30, bottom: 10),
               child: TextField(
                 controller: emailController,
-                obscureText: true,
+                style: GoogleFonts.neucha(fontSize: 20),
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
@@ -50,6 +50,7 @@ class _SignUpPageState extends State<SignUpPage> {
               margin: EdgeInsets.only(left: 30, right: 30, bottom: 20),
               child: TextField(
                 controller: passwordController,
+                style: GoogleFonts.neucha(fontSize: 20),
                 obscureText: true,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(

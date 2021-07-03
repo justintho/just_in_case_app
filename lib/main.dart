@@ -68,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
               margin: EdgeInsets.only(left: 30, right: 30, bottom: 10),
               child: TextField(
                 controller: emailController,
+                style: GoogleFonts.neucha(fontSize: 20),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)
@@ -81,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: TextField(
                 controller: passwordController,
                 obscureText: true,
+                style: GoogleFonts.neucha(fontSize: 20),
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)

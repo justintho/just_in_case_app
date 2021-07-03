@@ -142,12 +142,16 @@ class ReminderCreationPage extends StatefulWidget {
 
 class _ReminderCreationPageState extends State<ReminderCreationPage> {
   DateTime _date = DateTime.now();
+  DateTime _reminderDate = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
+  TimeOfDay _reminderTime = TimeOfDay.now();
   final myController1 = TextEditingController();
   final myController2 = TextEditingController();
   String icon = 'https://cdn0.iconfinder.com/data/icons/logistics-delivery-colored-2/128/32-512.png';
   String _selected = '';
   String errorMessage = '';
+  bool isChecked = false;
+  bool value = false;
 
   var iconList = [
     'https://cdn0.iconfinder.com/data/icons/logistics-delivery-colored-2/128/32-512.png',
@@ -413,6 +417,28 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
               child: Row(
                 children: [
                   Expanded(
+                    flex: 25,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 30),
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(bottom: 20),
+                            child: Text(
+                                'Deadline',
+                                style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                          Text(
+                            'Reminder',
+                              style: GoogleFonts.neucha(fontSize: 25, fontWeight: FontWeight.bold)
+                          )
+                        ],
+                      ),
+                    )
+                  ),
+                  Expanded(
+                    flex: 40,
                     child: Container(
                       child: Column(
                         children: [
@@ -435,11 +461,38 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                                   initialDate: DateTime.now(),
                                   firstDate: DateTime.now(),
                                   lastDate: DateTime(DateTime.now().year + 10),
-                                ).then((date) {
-                                  setState(() {
-                                    _date = date!;
+                                  ).then((date) {
+                                    setState(() {
+                                      _date = date!;
+                                      if (isChecked) {
+                                        _reminderDate = _date;
+                                      }
+                                    });
                                   });
-                                });
+                              }
+                          ),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.white,
+                                onPrimary: Colors.black,
+                              ),
+                              child: Text(
+                                  '${_reminderDate.month.toString().padLeft(2,'0')}/${_reminderDate.day.toString().padLeft(2,'0')}/${_reminderDate.year.toString()}',
+                                  style: GoogleFonts.courgette(fontSize: 20)
+                              ),
+                              onPressed: () {
+                                if (!isChecked) {
+                                  showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime.now(),
+                                    lastDate: _date,
+                                  ).then((date) {
+                                    setState(() {
+                                      _reminderDate = date!;
+                                    });
+                                  });
+                                }
                               }
                           )
                         ]
@@ -447,7 +500,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                     ),
                   ),
                   Expanded(
-                    flex: 1,
+                    flex: 35,
                     child: Container(
                       child: Column(
                         children: [
@@ -468,18 +521,68 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                                 showTimePicker(
                                   context: context,
                                   initialTime: TimeOfDay.now(),
-                                ).then((time) {
-                                  setState(() {
-                                    _time = time!;
-                                  });
+                              ).then((time) {
+                                setState(() {
+                                  _time = time!;
+                                  if (isChecked) {
+                                    _reminderTime = _time;
+                                  }
                                 });
+                              });
                               }
-                          )
+                          ),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.white,
+                                onPrimary: Colors.black,
+                              ),
+                              child: Text(
+                                  '${_reminderTime.format(context)}',
+                                  style: GoogleFonts.courgette(fontSize: 20)
+                              ),
+                              onPressed: () {
+                                if (!isChecked) {
+                                  showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  ).then((time) {
+                                    setState(() {
+                                      _reminderTime = time!;
+                                    });
+                                  });
+                                }
+                              }
+                              )
                         ]
                       ),
                     ),
                   )
                 ]
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 10, right: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Checkbox(
+                      checkColor: Colors.white,
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value!;
+                          if (isChecked) {
+                            _reminderDate = _date;
+                            _reminderTime = _time;
+                          }
+                        });
+                      }
+                      ),
+                  Text(
+                    'Set Reminder to Deadline Date and Time',
+                    style: GoogleFonts.neucha(fontSize: 20, fontStyle: FontStyle.italic),
+                  )
+                ],
               ),
             ),
             Spacer(),
@@ -490,7 +593,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                   children: [
                     Text(
                       errorMessage,
-                      style: TextStyle(
+                      style: GoogleFonts.neucha(
                         color: Colors.red.withOpacity(1),
                         fontSize: 18
                       )
@@ -504,7 +607,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      margin: EdgeInsets.only(top: 10, bottom: 20),
+                      margin: EdgeInsets.only(top: 3, bottom: 20),
                       child: Container(
                         margin: EdgeInsets.only(top: 5),
                         child: TextButton(
@@ -518,21 +621,25 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
                             ),
                             onPressed: () {
                               DateTime _dateTime = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
-                              if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime)) {
+                              DateTime _reminderDateTime = DateTime(_reminderDate.year, _reminderDate.month, _reminderDate.day, _reminderTime.hour, _reminderTime.minute);
+                              if (myController1.text.length != 0 && DateTime.now().isBefore(_dateTime) && !_dateTime.isBefore(_reminderDateTime)) {
                                 errorMessage = '';
-                                taskName = myController1.text;
+                                taskName = convertToTitleCase(myController1.text);
                                 if (myController2.text.length != 0)
                                   taskDescription = myController2.text;
                                 icon = determineIcon(_selected);
                                 String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-                                Task task = Task(taskName, taskDescription, _dateTime, icon, _dateTime, timestamp);
-                                _scheduleNotification(int.parse(timestamp));
+                                Task task = Task(taskName, taskDescription, _dateTime, icon, _reminderDateTime, timestamp);
+                                _scheduleNotification(int.parse(timestamp.substring(timestamp.length - 9)));
+
                                 taskDescription = "";
                                 Navigator.pop(context, task);
                               }
                               else
                                 if (myController1.text.length == 0)
                                   errorMessage = 'Please enter a task name.';
+                                else if (_dateTime.isBefore(_reminderDateTime))
+                                  errorMessage = 'Reminders cannot be sent after the deadline date.';
                                 else
                                   errorMessage = 'Invalid due date/time.';
                                 setState(() {
@@ -558,7 +665,7 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
         timestamp,
         taskName,
         taskDescription == "" ? "<No Message>" : taskDescription,
-        new DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute),
+        new DateTime(_reminderDate.year, _reminderDate.month, _reminderDate.day, _reminderTime.hour, _reminderTime.minute),
         const NotificationDetails(
             android: AndroidNotificationDetails('your channel id',
                 'your channel name', 'your channel description')),
@@ -592,6 +699,34 @@ class _ReminderCreationPageState extends State<ReminderCreationPage> {
     else
       return iconList[11];
   }
+}
+
+String convertToTitleCase(String text) {
+  String text2 = text.toLowerCase();
+  if (text2 == null) {
+    return "";
+  }
+
+  if (text2.length <= 1) {
+    return text2.toUpperCase();
+  }
+
+  // Split string into multiple words
+  final List<String> words = text2.split(' ');
+
+  // Capitalize first letter of each words
+  final capitalizedWords = words.map((word) {
+    if (word.trim().isNotEmpty) {
+      final String firstLetter = word.trim().substring(0, 1).toUpperCase();
+      final String remainingLetters = word.trim().substring(1);
+
+      return '$firstLetter$remainingLetters';
+    }
+    return '';
+  });
+
+  // Join/Merge all words back to one String
+  return capitalizedWords.join(' ');
 }
 
 extension DateTimeExtension on DateTime {

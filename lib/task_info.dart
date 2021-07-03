@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_in_case_app/reminder_creation.dart';
 
 class TaskInfoPage extends StatefulWidget {
   var taskInfo;
@@ -29,7 +30,8 @@ class _TaskInfoPageState extends State<TaskInfoPage> {
                     'Cancel'
                   )
                 ),
-                TextButton(onPressed: () {
+                TextButton(onPressed: () async {
+                  await flutterLocalNotificationsPlugin.cancel(int.parse(widget.taskInfo.getID().substring(widget.taskInfo.getID().length - 9)));
                   FirebaseDatabase.instance.reference()
                       .child(widget.email + "/task" + widget.taskInfo.getID())
                       .remove().whenComplete(() => Navigator.pop(context))
@@ -69,8 +71,9 @@ class _TaskInfoPageState extends State<TaskInfoPage> {
                     height: 50
                 ),
               ]
-          )
+          ),
         ),
+
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -158,15 +161,15 @@ class _TaskInfoPageState extends State<TaskInfoPage> {
                                   style: GoogleFonts.amaticaSc(fontSize: 30, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  widget.taskInfo.getDueDateTime().month.toString().padLeft(2,'0')
+                                  widget.taskInfo.getReminderDueDateTime().month.toString().padLeft(2,'0')
                                       + '/'
-                                      + widget.taskInfo.getDueDateTime().day.toString().padLeft(2,'0')
+                                      + widget.taskInfo.getReminderDueDateTime().day.toString().padLeft(2,'0')
                                       + '/'
-                                      + widget.taskInfo.getDueDateTime().year.toString(),
+                                      + widget.taskInfo.getReminderDueDateTime().year.toString(),
                                   style: GoogleFonts.courgette(fontSize: 20),
                                 ),
                                 Text(
-                                  widget.taskInfo.getDueTime().format(context),
+                                  widget.taskInfo.getReminderDueTime().format(context),
                                   style: GoogleFonts.courgette(fontSize: 20),
                                 ),
                               ],
@@ -178,50 +181,41 @@ class _TaskInfoPageState extends State<TaskInfoPage> {
                 ),
                 Spacer(),
                 Container(
-                  margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  width: 200,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/tape2.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            iconSize: 50,
-                            color: Colors.black,
-                            onPressed: () {
-                              print('hello');
-                            },
-                          ),
-                          Text(
-                            'Edit',
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold
-                            ),
-                          )
-                        ],
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        iconSize: 40,
+                        color: Colors.black,
+                        onPressed: () {
+                          _showDeleteDialog();
+                        },
                       ),
-                      Spacer(),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            iconSize: 50,
-                            color: Colors.black,
+                      Container(
+                        margin: EdgeInsets.only(right: 10),
+                        child: TextButton(
+                            child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold
+                                )
+                            ),
                             onPressed: () {
                               _showDeleteDialog();
                             },
-                          ),
-                          Text(
-                            'Delete',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold
-                            )
-                          ),
-                        ],
-                      )
+                        ),
+                      ),
                     ],
                   ),
                 )
