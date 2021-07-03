@@ -12,10 +12,12 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,6 +62,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
             ),
+            Text(
+              error,
+              style: GoogleFonts.neucha(fontSize: 20, color: Colors.red),
+            ),
             Container(
               margin: EdgeInsets.only(bottom: 10),
               width: 200,
@@ -76,9 +82,20 @@ class _SignUpPageState extends State<SignUpPage> {
                       email: emailController.text,
                       password: passwordController.text
                       ).then((value) {
+                        error = '';
+                        setState(() {
+
+                        });
                         print("Successfully signed up!");
                         Navigator.pop(context);
                       }).catchError((error) {
+                        if (passwordController.text.length < 6)
+                          this.error = 'Password must be at least 6 characters';
+                        else
+                          this.error = 'Invalid Email or Password.';
+                        setState(() {
+
+                        });
                         print("Failed to sign up!");
                         print(error.toString());
                       });

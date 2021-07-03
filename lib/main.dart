@@ -42,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
+  String error = "";
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            Text(
+              error,
+              style: GoogleFonts.neucha(fontSize: 20, color: Colors.red),
+            ),
             Container(
               margin: EdgeInsets.only(bottom: 10),
               width: 200,
@@ -107,6 +112,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       email: emailController.text,
                       password: passwordController.text
                       ).then((value) {
+                        error = '';
+                        setState(() {
+
+                        });
                         print("Login success!");
                         Navigator.push(
                           context,
@@ -114,6 +123,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           MaterialPageRoute(builder: (context) => ReminderListPage(emailController.text)),
                         );
                       }).catchError((error) {
+                        if (passwordController.text.length < 6)
+                          this.error = 'Password must be at least 6 characters.';
+                        else
+                          this.error = 'Invalid email or password.';
+                        setState(() {
+
+                        });
                         print("Login failed!");
                         print(error.toString());
                       });
