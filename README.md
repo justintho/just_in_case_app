@@ -2,6 +2,11 @@
 
 A task reminder app for android and IOS devices that was developed using Dart with Google's Flutter framework. Users can create an account and use the app to create reminders for themselves while interacting with a user-friendly interface. The reminders can be scheduled for a certain day and time and will be displayed on your device as a notification at the scheduled time. Reminders will be sorted into a chronologically ordered list and can be deleted/canceled at anytime before the scheduled date.
 
+Implements:
+- Firebase Authentication
+- Firebase Realtime Database
+- Google Fonts
+
 ## Sample Images
 
 <p align="center">
